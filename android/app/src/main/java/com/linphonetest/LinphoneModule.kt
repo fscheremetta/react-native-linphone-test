@@ -88,7 +88,7 @@ class LinphoneModule(reactContext: ReactApplicationContext): ReactContextBaseJav
             } else if (state == RegistrationState.Ok) {
                 promise.resolve("Registration successful")
             }
-        }
+        } 
 
         account.addListener(listener)
         core.start()
