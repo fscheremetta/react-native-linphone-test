@@ -1,44 +1,64 @@
 import {
   EmitterSubscription,
   NativeEventEmitter,
-  NativeModules
-} from "react-native";
-const { LinphoneModule } = NativeModules;
+  NativeModules,
+} from 'react-native';
+const {LinphoneModule} = NativeModules;
 
 interface RegisterConfig {
   username: string;
   password: string;
   domain: string;
-  transport?: "Udp" | "Tcp" | "Tls";
+  transport?: 'Udp' | 'Tcp' | 'Tls';
 }
 
 type CallState =
-  | "Idle"
-  | "IncomingReceived"
-  | "PushIncomingReceived"
-  | "OutgoingInit"
-  | "OutgoingProgress"
-  | "OutgoingRinging"
-  | "OutgoingEarlyMedia"
-  | "Connected"
-  | "StreamsRunning"
-  | "Pausing"
-  | "Paused"
-  | "Resuming"
-  | "Referred"
-  | "Error"
-  | "End"
-  | "PausedByRemote"
-  | "UpdatedByRemote"
-  | "IncomingEarlyMedia"
-  | "Updating"
-  | "Released"
-  | "EarlyUpdatedByRemote"
-  | "EarlyUpdating";
+  | 'Idle'
+  | 'IncomingReceived'
+  | 'PushIncomingReceived'
+  | 'OutgoingInit'
+  | 'OutgoingProgress'
+  | 'OutgoingRinging'
+  | 'OutgoingEarlyMedia'
+  | 'Connected'
+  | 'StreamsRunning'
+  | 'Pausing'
+  | 'Paused'
+  | 'Resuming'
+  | 'Referred'
+  | 'Error'
+  | 'End'
+  | 'PausedByRemote'
+  | 'UpdatedByRemote'
+  | 'IncomingEarlyMedia'
+  | 'Updating'
+  | 'Released'
+  | 'EarlyUpdatedByRemote'
+  | 'EarlyUpdating';
 
 type CallEvent = {
   state: CallState;
   message: string;
+};
+
+type AudioDevice = {
+  id: string;
+  name: string;
+  driverName: string;
+  capabilities: 'CapabilityRecord' | 'CapabilityPlay' | 'CapabilityAll';
+  type:
+    | 'Unknown'
+    | 'Microphone'
+    | 'Earpiece'
+    | 'Speaker'
+    | 'Bluetooth'
+    | 'BluetoothA2DP'
+    | 'Telephony'
+    | 'AuxLine'
+    | 'GenericUsb'
+    | 'Headset'
+    | 'Headphones'
+    | 'HearingAid';
 };
 
 class CallEvents extends NativeEventEmitter {
@@ -47,9 +67,9 @@ class CallEvents extends NativeEventEmitter {
   }
 
   addListener(
-    eventType: "callstate",
+    eventType: 'callstate',
     listener: (event: CallEvent) => void,
-    context?: Object | undefined
+    context?: Object | undefined,
   ): EmitterSubscription {
     return super.addListener(eventType, listener, context);
   }
@@ -74,7 +94,7 @@ export function register(config: RegisterConfig): Promise<void> {
     config.username,
     config.password,
     config.domain,
-    config.transport ?? "Udp"
+    config.transport ?? 'Udp',
   );
 }
 
@@ -95,10 +115,16 @@ export function decline(): Promise<void> {
 }
 
 export function call(address: string): Promise<void> {
-  console.log("[JS] address", address);
   return LinphoneModule.call(address);
 }
 
 export function terminate(): Promise<void> {
   return LinphoneModule.terminate();
+}
+
+export function getAudioDevices(): Promise<{
+  devices: AudioDevice[];
+  current: string;
+}> {
+  return LinphoneModule.getAudioDevices();
 }

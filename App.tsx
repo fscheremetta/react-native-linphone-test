@@ -5,29 +5,25 @@
  * @format
  */
 
-import React, { useEffect } from "react";
+import React, {useEffect} from 'react';
 import {
   Button,
   EventSubscription,
   PermissionsAndroid,
   StyleSheet,
-  Text,
-  Touchable,
-  TouchableOpacity,
-  View
-} from "react-native";
-
+  View,
+} from 'react-native';
 import {
   accept,
   call,
   callEvents,
   decline,
+  getAudioDevices,
   register,
-  terminate
-} from "./linphone";
-import RNCallKeep from "react-native-callkeep";
+  terminate,
+} from './linphone';
 
-function App() {
+function App(): React.JSX.Element {
   const [calling, setCalling] = React.useState(false);
   const [registered, setRegistered] = React.useState(false);
   const [active, setActive] = React.useState(false);
@@ -35,78 +31,43 @@ function App() {
   async function initLinphone() {
     try {
       await register({
-        username: "fernandamindtech",
-        password: "a111276A",
-        domain: "sip.linphone.org"
+        username: 'mateus',
+        password: 'password',
+        domain: 'testes.mindtech.com.br',
       });
 
-      console.log("register");
+      console.log('register');
       setRegistered(true);
     } catch (error) {
-      console.error("REGISTRATION ERROR", error);
+      console.error('REGISTRATION ERROR', error);
     }
   }
 
-  // function initCallkeep() {
-  //   RNCallKeep.setup({
-  //     android: {
-  //       alertTitle: "Permissions required",
-  //       alertDescription:
-  //         "This application needs to access your phone accounts",
-  //       cancelButton: "Cancel",
-  //       okButton: "ok",
-  //       additionalPermissions: []
-  //     },
-  //     ios: {
-  //       appName: "LinhponeTest"
-  //     }
-  //   });
-
-    // RNCallKeep.setAvailable(true);
-
-    // RNCallKeep.addEventListener("answerCall", accept);
-    // RNCallKeep.addEventListener("endCall", terminate);
-    // RNCallKeep.addEventListener("didDisplayIncomingCall", event => {
-    //   console.log(event);
-    // });
-    // RNCallKeep.addEventListener("createIncomingConnectionFailed", event => {
-    //   console.log(event);
-    // });
-  // }
-
   useEffect(() => {
     PermissionsAndroid.requestMultiple([
-      "android.permission.RECORD_AUDIO",
-      "android.permission.USE_SIP"
+      'android.permission.RECORD_AUDIO',
+      'android.permission.USE_SIP',
     ]);
 
-    initLinphone()
-    // .then(initCallkeep);
+    initLinphone();
   }, []);
-  
+
   useEffect(() => {
     let sub: EventSubscription;
 
     if (registered) {
-      console.log("sub to events");
+      console.log('sub to events');
+      getAudioDevices().then(console.log);
 
-      sub = callEvents.addListener("callstate", event => {
-        console.log("[JS] event", event);
+      sub = callEvents.addListener('callstate', event => {
+        console.log('[JS] event', event);
 
-        if (event?.state === "IncomingReceived") {
+        if (event?.state === 'IncomingReceived') {
           setCalling(true);
-
-          // RNCallKeep.displayIncomingCall(
-          //   "123",
-          //   "mateus",
-          //   "mateus",
-          //   "generic",
-          //   false
-          // );
-        } else if (event?.state === "End") {
+        } else if (event?.state === 'End') {
           setCalling(false);
           setActive(false);
-        } else if (event?.state === "Connected") {
+        } else if (event?.state === 'Connected') {
           setActive(true);
         }
       });
@@ -120,8 +81,8 @@ function App() {
   if (calling) {
     return (
       <View>
-        <Button title="Aceitar" onPress={() => accept()} />
-        <Button title="Recusar" onPress={() => decline()} />
+        <Button title="Accept" onPress={() => accept()} />
+        <Button title="Decline" onPress={() => decline()} />
       </View>
     );
   }
@@ -134,33 +95,12 @@ function App() {
     );
   }
 
-  function onPress() {
-    console.log("[onPress] init");
-    if (!registered) {
-      console.log("[onPress] registered");
-      initLinphone();
-    } else if (!calling && !active) {
-      console.log("[onPress] call");
-      // RNCallKeep.startCall("123", "mateus", "mateus", "generic");
-      call("sip:fernandamind@sip.linphone.org");
-    } else if (calling) {
-      console.log("[onPress] calling");
-      accept();
-    } else if (active) {
-      console.log("[onPress] active");
-      terminate();
-    }
-  }
-
   return (
     <View>
-      <Text>Aceite aqui</Text>
-      <TouchableOpacity
-        onPress={onPress}
-        // onPress={() => call("sip:fernanda@sip.dev.ppacontatto.com.br")}
-      >
-        <Text>Tocaqui</Text>
-      </TouchableOpacity>
+      <Button
+        title="Call"
+        onPress={() => call('sip:mateus2@testes.mindtech.com.br')}
+      />
     </View>
   );
 }
