@@ -35,9 +35,9 @@ function App() {
   async function initLinphone() {
     try {
       await register({
-        username: "mateus",
-        password: "password",
-        domain: "testes.mindtech.com.br"
+        username: "fernandamindtech",
+        password: "a111276A",
+        domain: "sip.linphone.org"
       });
 
       console.log("register");
@@ -47,32 +47,32 @@ function App() {
     }
   }
 
-  function initCallkeep() {
-    RNCallKeep.setup({
-      android: {
-        alertTitle: "Permissions required",
-        alertDescription:
-          "This application needs to access your phone accounts",
-        cancelButton: "Cancel",
-        okButton: "ok",
-        additionalPermissions: []
-      },
-      ios: {
-        appName: "LinhponeTest"
-      }
-    });
+  // function initCallkeep() {
+  //   RNCallKeep.setup({
+  //     android: {
+  //       alertTitle: "Permissions required",
+  //       alertDescription:
+  //         "This application needs to access your phone accounts",
+  //       cancelButton: "Cancel",
+  //       okButton: "ok",
+  //       additionalPermissions: []
+  //     },
+  //     ios: {
+  //       appName: "LinhponeTest"
+  //     }
+  //   });
 
-    RNCallKeep.setAvailable(true);
+    // RNCallKeep.setAvailable(true);
 
-    RNCallKeep.addEventListener("answerCall", accept);
-    RNCallKeep.addEventListener("endCall", terminate);
-    RNCallKeep.addEventListener("didDisplayIncomingCall", event => {
-      console.log(event);
-    });
-    RNCallKeep.addEventListener("createIncomingConnectionFailed", event => {
-      console.log(event);
-    });
-  }
+    // RNCallKeep.addEventListener("answerCall", accept);
+    // RNCallKeep.addEventListener("endCall", terminate);
+    // RNCallKeep.addEventListener("didDisplayIncomingCall", event => {
+    //   console.log(event);
+    // });
+    // RNCallKeep.addEventListener("createIncomingConnectionFailed", event => {
+    //   console.log(event);
+    // });
+  // }
 
   useEffect(() => {
     PermissionsAndroid.requestMultiple([
@@ -80,9 +80,10 @@ function App() {
       "android.permission.USE_SIP"
     ]);
 
-    initLinphone().then(initCallkeep);
+    initLinphone()
+    // .then(initCallkeep);
   }, []);
-
+  
   useEffect(() => {
     let sub: EventSubscription;
 
@@ -95,13 +96,13 @@ function App() {
         if (event?.state === "IncomingReceived") {
           setCalling(true);
 
-          RNCallKeep.displayIncomingCall(
-            "123",
-            "mateus",
-            "mateus",
-            "generic",
-            false
-          );
+          // RNCallKeep.displayIncomingCall(
+          //   "123",
+          //   "mateus",
+          //   "mateus",
+          //   "generic",
+          //   false
+          // );
         } else if (event?.state === "End") {
           setCalling(false);
           setActive(false);
@@ -156,7 +157,7 @@ function App() {
       <Text>Aceite aqui</Text>
       <TouchableOpacity
         onPress={onPress}
-        // onPress={() => call("sip:mateus@testes.mindtech.com.br")}
+        // onPress={() => call("sip:fernanda@sip.dev.ppacontatto.com.br")}
       >
         <Text>Tocaqui</Text>
       </TouchableOpacity>
