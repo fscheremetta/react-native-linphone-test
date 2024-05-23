@@ -121,7 +121,7 @@ dependencies {
         implementation jscFlavor
     }
 
-    implementation 'org.linphone:linphone-sdk-android:5.3.13'
+    implementation 'org.linphone:linphone-sdk-android:5.0+'
     implementation 'androidx.media:media:1.7.0'
     implementation 'androidx.core:core-telecom:1.0.0-alpha02'
 }
