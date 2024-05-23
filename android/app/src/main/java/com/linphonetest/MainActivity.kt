@@ -1,5 +1,7 @@
 package com.linphonetest
 
+import android.content.Intent
+import android.os.Bundle
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
@@ -7,16 +9,37 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate
 
 class MainActivity : ReactActivity() {
 
-  /**
-   * Returns the name of the main component registered from JavaScript. This is used to schedule
-   * rendering of the component.
-   */
-  override fun getMainComponentName(): String = "linphoneTest"
+    override fun getMainComponentName(): String = "linphoneTest"
 
-  /**
-   * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
-   * which allows you to enable New Architecture with a single boolean flags [fabricEnabled]
-   */
-  override fun createReactActivityDelegate(): ReactActivityDelegate =
-      DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
+    override fun createReactActivityDelegate(): ReactActivityDelegate =
+        DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        handleIntentAction(intent)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        handleIntentAction(intent)
+    }
+
+    private fun handleIntentAction(intent: Intent?) {
+        if (intent != null) {
+            val action = intent.action
+            if ("ACCEPT_CALL" == action) {
+                val linphoneModule = getLinphoneModule()
+                linphoneModule?.accept()
+            } else if ("DECLINE_CALL" == action) {
+                val linphoneModule = getLinphoneModule()
+                linphoneModule?.decline()
+            }
+        }
+    }
+
+    private fun getLinphoneModule(): LinphoneModule? {
+        val reactInstanceManager = reactInstanceManager
+        val reactContext = reactInstanceManager.currentReactContext
+        return reactContext?.getNativeModule(LinphoneModule::class.java)
+    }
 }
