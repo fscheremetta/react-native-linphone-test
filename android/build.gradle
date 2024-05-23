@@ -19,8 +19,3 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
-
-ktlint {
-    android = true
-    ignoreFailures = true
-}
