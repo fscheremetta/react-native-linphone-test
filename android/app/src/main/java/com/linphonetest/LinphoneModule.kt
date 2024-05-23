@@ -106,34 +106,40 @@ class LinphoneModule(reactContext: ReactApplicationContext): ReactContextBaseJav
      * */
 
     @ReactMethod fun register(username: String, password: String, domain: String, transport: String, promise: Promise) {
-        val authInfo = Factory.instance().createAuthInfo(username, null, password, null, null, null);
-        val accountParams = core.createAccountParams();
+        CoroutineScope(SupervisorJob()).launch {
+            try {
+                val authInfo = Factory.instance().createAuthInfo(username, null, password, null, null, null)
+                val accountParams = core.createAccountParams()
 
-        val identity = Factory.instance().createAddress("sip:${username}@${domain}")
-        accountParams.identityAddress = identity;
+                val identity = Factory.instance().createAddress("sip:${username}@${domain}")
+                accountParams.identityAddress = identity
 
-        val address = Factory.instance().createAddress("sip:${domain}")
+                val address = Factory.instance().createAddress("sip:${domain}")
+                address?.transport = TransportType.valueOf(transport)
+                accountParams.serverAddress = address
+                // accountParams.isRegisterEnabled = true
 
-        address?.transport = TransportType.valueOf(transport)
-        accountParams.serverAddress = address
-        accountParams.isRegisterEnabled = true
+                val account = core.createAccount(accountParams)
+                core.addAuthInfo(authInfo)
+                core.addAccount(account)
+                core.defaultAccount = account
 
-        val account = core.createAccount(accountParams)
-        core.addAuthInfo(authInfo)
-        core.addAccount(account)
-        core.defaultAccount = account
+                val listener = { _: Account, state: RegistrationState, message: String ->
+                    if (state !== RegistrationState.Ok && state !== RegistrationState.Progress) {
+                        promise.reject(state.toString(), message)
+                    } else if (state == RegistrationState.Ok) {
+                        promise.resolve("Registration successful")
+                    }
+                }
 
-        val listener = { _: Account, state: RegistrationState, message: String ->
-            if (state !== RegistrationState.Ok && state !== RegistrationState.Progress) {
-                promise.reject(state.toString(), message)
-            } else if (state == RegistrationState.Ok) {
-                promise.resolve("Registration successful")
+                account.addListener(listener)
+                core.start()
+            } catch (e: Exception) {
+                promise.reject("register_error", e.message)
             }
         }
-
-        account.addListener(listener)
-        core.start()
     }
+
 
     @ReactMethod fun unregister(promise: Promise) {
         val account = core.defaultAccount
@@ -142,7 +148,7 @@ class LinphoneModule(reactContext: ReactApplicationContext): ReactContextBaseJav
         val params = account.params
         val clonedParams = params.clone()
 
-        clonedParams.isRegisterEnabled = false
+        // clonedParams.isRegisterEnabled = false
         account.params = clonedParams
 
         account.addListener{ _, state, message ->
